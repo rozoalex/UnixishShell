@@ -11,22 +11,27 @@ public class CdFilter extends SequentialFilterAdvanced {
     public CdFilter(Queue<String> inp){
         this.input=inp;
         commandName = "cd";
+        initializeInOut();
     }
 
     public CdFilter(){
         this.input=null;
         commandName = "cd";
+        initializeInOut();
     }
 
     @Override
     public void process() {
-        if(input.size()==1){
+        if(input.size()==0){
             System.out.println(Message.REQUIRES_PARAMETER.with_parameter(commandName));
-        }else if(input.size()==2){
-            output.add(processLine(input.poll()));
+        }else if(input.size()==1){
             output.add(processLine(input.poll()));
         }else{
-
+            String temp="cd";
+            for(String s:input){
+                temp = temp + " "+s;
+            }
+            System.out.println(Message.COMMAND_NOT_FOUND.with_parameter(temp));
         }
     }
 

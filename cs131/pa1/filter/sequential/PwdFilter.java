@@ -9,23 +9,33 @@ public class PwdFilter extends SequentialFilterAdvanced{
     public PwdFilter(Queue<String> inp){
         this.input=inp;
         commandName= "pwd";
+        initializeInOut();
     }
 
     public PwdFilter(){
         this.input=null;
         commandName= "pwd";
+        initializeInOut();
     }
 
 
 
     @Override
-    protected  String processLine(String line){
-        if(input.isEmpty()) {
-            return SequentialREPL.currentWorkingDirectory;
+    public void process(){
+        if (input.isEmpty()){
+            String processedLine = processLine();
+            if (processedLine != null){
+                output.add(processedLine);
+            }
         }else{
             System.out.println(Message.CANNOT_HAVE_INPUT.with_parameter(commandName));
-            return null;
         }
+    }
+
+
+
+    private String processLine(){
+        return SequentialREPL.currentWorkingDirectory;
     }
 
 

@@ -15,17 +15,24 @@ public class LsFilter extends SequentialFilterAdvanced {
     public LsFilter(Queue<String> inp){
         setInput(inp);
         commandName = "ls";
+        initializeInOut();
 
     }
 
     public LsFilter(){
         this.input=null;
         commandName = "ls";
+        initializeInOut();
+    }
+
+    @Override
+    public void process(){
+        output.add(processLine());
+        //System.out.println("output peek is "+output.peek());
     }
 
 
-    @Override
-    protected  String processLine(String line){
+    protected  String processLine(){
         if(input.isEmpty()) {
             File[] listFileNames = (new File(SequentialREPL.currentWorkingDirectory)).listFiles();
             String tempFileNames="";
@@ -37,6 +44,7 @@ public class LsFilter extends SequentialFilterAdvanced {
                     tempFileNames=tempFileNames+"\n";
                 }
             }
+            //System.out.println("tempFileNames is "+tempFileNames);
             return tempFileNames;
 
         }else{

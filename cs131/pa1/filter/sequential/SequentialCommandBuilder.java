@@ -9,6 +9,7 @@ public class SequentialCommandBuilder {
 
 	private String rowInput;
 	private SequentialFilterAdvanced head;
+	private boolean isDone=false;
 
 	public SequentialCommandBuilder(String rowInput){
 		this.rowInput = rowInput;
@@ -20,11 +21,13 @@ public class SequentialCommandBuilder {
 	//the first filter is at the buttom
 	private Stack<SequentialFilterAdvanced> createFiltersFromCommand(String rowInp){
 		Scanner commandScanner = new Scanner(rowInp);
+		//System.out.println("In createFiltersFromCommand,  rowInp is "+rowInp);
 		Stack<SequentialFilterAdvanced> filterStack=new Stack<>() ;
 		int positionCounter=0;
 		SequentialFilterAdvanced currentFilter=null;
 		while (commandScanner.hasNext()){
 			String temp=commandScanner.next();
+			//System.out.println("In createFiltersFromCommand,  temp is "+temp);
 			if(temp.equals("|")){
 				if (currentFilter!=null){
 					filterStack.push(currentFilter);
@@ -36,6 +39,7 @@ public class SequentialCommandBuilder {
 
 			if(positionCounter==0&&SequentialREPL.commandCollection.keySet().contains(temp)){
 				currentFilter=SequentialREPL.commandCollection.get(temp);
+				//System.out.println("setup filter "+ currentFilter.getCommandName());
 			}else if(positionCounter!=0&&currentFilter!=null){
 				currentFilter.addInput(temp);
 			} else{
@@ -51,6 +55,7 @@ public class SequentialCommandBuilder {
 		}
 
 
+		//System.out.println(filterStack.peek().getCommandName());
 		return filterStack;
 	}
 
@@ -68,17 +73,36 @@ public class SequentialCommandBuilder {
 		}
 	}
 
+
+	//recursively execute the filters
 	private void execution(SequentialFilterAdvanced sfa){
 		if(sfa!=null){
 			sfa.process();
+			execution(sfa.getNext());
+			if(isDone){
+				//System.out.println("output peek is "+sfa.getOutput().peek());
+				printAll(sfa.getOutput());
+
+				isDone=false;
+			}
+			sfa.clear();//clear the filter for reuse
+		}else{
+			isDone=true;
 		}
 
-		if(sfa.hasNext()){
-			execution(sfa.getNext());
-		}
 
 	}
 
+	//method for print the final result
+	private void printAll(Queue<String> output) {
+	    if(!output.isEmpty()) {
+            for (String s : output) {
+                if(s!=null) {
+                    System.out.println(s);
+                }
+            }
+        }
+	}
 
 
 	//Client can only call start to execute commands
@@ -86,6 +110,7 @@ public class SequentialCommandBuilder {
 		linkFilters(createFiltersFromCommand(this.rowInput));
 		execution(this.head);
 
-
 	}
+
+
 }

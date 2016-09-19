@@ -2,6 +2,7 @@ package cs131.pa1.filter.sequential;
 
 import cs131.pa1.filter.Filter;
 
+import java.util.LinkedList;
 import java.util.Queue;
 
 /**
@@ -11,6 +12,12 @@ public abstract class SequentialFilterAdvanced extends SequentialFilter {
 
     protected String commandName;
 
+
+    protected void initializeInOut(){
+        input=new LinkedList<>();
+        output=new LinkedList<>();
+
+    }
 
     public void setInput(Queue<String> inp){
         this.input=inp;
@@ -25,13 +32,14 @@ public abstract class SequentialFilterAdvanced extends SequentialFilter {
     }
 
     public void clear(){
-        this.input=null;
-        this.output=null;
+        this.input.clear();
+        this.output.clear();
         this.prev=null;
         this.next=null;
     }
 
     public boolean hasNext(){
+
         return (next!=null);
     }
 
@@ -39,6 +47,10 @@ public abstract class SequentialFilterAdvanced extends SequentialFilter {
     public SequentialFilterAdvanced getNext(){
         SequentialFilterAdvanced sfa= (SequentialFilterAdvanced) next;
         return sfa;
+    }
+
+    public Queue<String> getOutput(){
+        return output;
     }
 
 
