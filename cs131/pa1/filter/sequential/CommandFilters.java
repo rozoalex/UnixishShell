@@ -5,20 +5,21 @@ package cs131.pa1.filter.sequential;
  * easy to add new commands
  */
 public enum CommandFilters {
-    LS("ls",new LsFilter()),
-    PWD("pwd",new PwdFilter()),
-    CD("cd",new CdFilter()),
-    HEAD("head",new HeadFilter()),
-    GREP("grep",new GrepFilter()),
-    WC("wc",new WcFilter()),
-    WRITE(">",new WriteFilter()),;
+    LS(new LsFilter()),
+    PWD(new PwdFilter()),
+    CD(new CdFilter()),
+    HEAD(new HeadFilter()),
+    GREP(new GrepFilter()),
+    WC(new WcFilter()),
+    WRITE(new WriteFilter()),;
 
     private SequentialFilterAdvanced sf;
     private final String filterName;
 
-    CommandFilters(String filterName,SequentialFilterAdvanced sf) {
+    CommandFilters(SequentialFilterAdvanced sf) {
         this.sf=sf;
         this.filterName=sf.getCommandName();
+        //System.out.println(this.filterName);
 
     }
 

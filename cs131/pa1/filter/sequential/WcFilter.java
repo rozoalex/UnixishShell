@@ -1,6 +1,9 @@
 package cs131.pa1.filter.sequential;
 
+import cs131.pa1.filter.Message;
+
 import java.util.Queue;
+import java.util.Scanner;
 
 /**
  * Created by rozoa on 9/18/2016.
@@ -9,18 +12,40 @@ public class WcFilter extends SequentialFilterAdvanced {
 
     public WcFilter(Queue<String> inp){
         setInput(inp);
+        initializeInOut();
+        commandName="wc";
     }
 
     public WcFilter(){
         this.input=null;
-    }
-
-    public void setInput(Queue<String> inp){
-        this.input=inp;
+        initializeInOut();
+        commandName="wc";
     }
 
     @Override
-    protected String processLine(String line) {
-        return null;
+    public void addInput(String parameters) {
+        SequentialCommandBuilder.doesErrorHappen=true;
+        System.out.println(Message.INVALID_PARAMETER.with_parameter(commandName));
     }
+
+    @Override
+    public void process() {
+        String out="";
+        out=out+String.valueOf(input.size());
+        int numbOfWords=0;
+        int numbOfChars=0;
+        while(!input.isEmpty()){
+            String temp=input.poll();
+            Scanner tempScan = new Scanner(temp);
+            while(tempScan.hasNext()){
+                numbOfWords++;
+                String word=tempScan.next();
+                numbOfChars=numbOfChars+word.length();
+            }
+        }
+        out=out+" "+String.valueOf(numbOfWords)+" "+String.valueOf(numbOfChars);
+        output.add(out);
+    }
+
+
 }

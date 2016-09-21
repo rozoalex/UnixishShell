@@ -1,7 +1,9 @@
 package cs131.pa1.filter.sequential;
 
 import cs131.pa1.filter.Filter;
+import cs131.pa1.filter.Message;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -23,8 +25,26 @@ public abstract class SequentialFilterAdvanced extends SequentialFilter {
         this.input=inp;
     }
 
+    public void addAllInput(Queue<String> inp){
+        this.input.addAll(inp);
+    }
+
     public void addInput(String parameters){
         this.input.add(parameters);
+    }
+
+    public void setNextInp(Queue<String> inp){
+            if (this.output == null) {
+                this.output = new LinkedList<String>();
+            }
+
+
+
+            if (this.next instanceof SequentialFilterAdvanced) {
+                SequentialFilterAdvanced nextSFA = (SequentialFilterAdvanced) this.next;
+                nextSFA.addAllInput(inp);
+            }
+
     }
 
     public String getCommandName(){
@@ -53,8 +73,17 @@ public abstract class SequentialFilterAdvanced extends SequentialFilter {
         return output;
     }
 
+    protected void meaninglessLongCommand(){
+        String temp=this.getCommandName()+"";
+        for(String s:input){
+            temp = temp + " "+s;
+        }
+        System.out.print(Message.COMMAND_NOT_FOUND.with_parameter(temp));
 
-    protected String processLine(String line) {
+    }
+
+
+    protected String processLine(String line)  {
         return null;
     }
 }

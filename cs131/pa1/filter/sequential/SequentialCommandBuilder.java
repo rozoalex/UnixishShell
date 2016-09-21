@@ -10,8 +10,9 @@ public class SequentialCommandBuilder {
 	private String rowInput;
 	private SequentialFilterAdvanced head;
 	private boolean isDone=false;
+    public static boolean doesErrorHappen=false;
 
-	public SequentialCommandBuilder(String rowInput){
+    public SequentialCommandBuilder(String rowInput){
 		this.rowInput = rowInput;
 	}
 
@@ -20,34 +21,47 @@ public class SequentialCommandBuilder {
 	//returns a stack of all filters with parameters
 	//the first filter is at the buttom
 	private Stack<SequentialFilterAdvanced> createFiltersFromCommand(String rowInp){
+		//rowInp=rowInp.replaceAll("|"," | ");
 		Scanner commandScanner = new Scanner(rowInp);
 		//System.out.println("In createFiltersFromCommand,  rowInp is "+rowInp);
 		Stack<SequentialFilterAdvanced> filterStack=new Stack<>() ;
 		int positionCounter=0;
+        int counter=0;
 		SequentialFilterAdvanced currentFilter=null;
 		while (commandScanner.hasNext()){
 			String temp=commandScanner.next();
-			//System.out.println("In createFiltersFromCommand,  temp is "+temp);
+			//System.out.println("------temp is "+temp);
 			if(temp.equals("|")){
 				if (currentFilter!=null){
 					filterStack.push(currentFilter);
 				}
 				currentFilter=null;
 				positionCounter=0;
+			}else {
+                //System.out.println(positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp));
+				if (positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp)) {
+					currentFilter = SequentialREPL.commandCollection.get(temp);
+					//System.out.println("setup filter " + currentFilter.getCommandName());
+				} else if (positionCounter != 0 && currentFilter != null) {
+					currentFilter.addInput(temp);
+					//System.out.println("add inp " + temp);
+				} else {
+					System.out.println(Message.COMMAND_NOT_FOUND.with_parameter(temp));
+					return null;
+				}
+
+				if(counter==0 &&(temp.equals("grep")|| temp.equals("wc")|| temp.equals(">"))){
+                    System.out.println(Message.REQUIRES_INPUT.with_parameter(temp));
+                    return null;
+                }
+                positionCounter++;
 			}
 
-
-			if(positionCounter==0&&SequentialREPL.commandCollection.keySet().contains(temp)){
-				currentFilter=SequentialREPL.commandCollection.get(temp);
-				//System.out.println("setup filter "+ currentFilter.getCommandName());
-			}else if(positionCounter!=0&&currentFilter!=null){
-				currentFilter.addInput(temp);
-			} else{
-				System.out.println(Message.COMMAND_NOT_FOUND.with_parameter(temp));
-				return null;
-			}
-
-			positionCounter++;
+            counter++;
+            if(doesErrorHappen){
+            	doesErrorHappen=false;
+                return null;
+            }
 		}
 
 		if (currentFilter!=null){
@@ -62,15 +76,17 @@ public class SequentialCommandBuilder {
 	//set up head
 	//the first filter to execute
 	private void linkFilters(Stack<SequentialFilterAdvanced> filters){
-		if(!filters.isEmpty()){
-			this.head=filters.pop();
-		}
+	    if(filters!=null) {
+            if (!filters.isEmpty()) {
+                this.head = filters.pop();
+            }
 
-		while(!filters.isEmpty()){
-			SequentialFilterAdvanced current = filters.pop();
-			current.setNextFilter(head);
-			head=current;
-		}
+            while (!filters.isEmpty()) {
+                SequentialFilterAdvanced current = filters.pop();
+                current.setNextFilter(head);
+                head = current;
+            }
+        }
 	}
 
 
@@ -78,6 +94,9 @@ public class SequentialCommandBuilder {
 	private void execution(SequentialFilterAdvanced sfa){
 		if(sfa!=null){
 			sfa.process();
+            if(sfa.getNext()!=null) {
+                sfa.getNext().setInput(sfa.output);
+            }
 			execution(sfa.getNext());
 			if(isDone){
 				//System.out.println("output peek is "+sfa.getOutput().peek());

@@ -23,7 +23,9 @@ public class SequentialREPL {
         while(isRunning){
             System.out.print(Message.NEWCOMMAND);
             String nextCommand=r.nextLine();
-            doCommand(nextCommand);
+            if(!nextCommand.equals("")) {
+                doCommand(nextCommand);
+            }
             //System.out.println();
 		}
         System.out.print(Message.GOODBYE);

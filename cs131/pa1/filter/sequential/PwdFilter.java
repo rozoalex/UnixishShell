@@ -28,7 +28,7 @@ public class PwdFilter extends SequentialFilterAdvanced{
                 output.add(processedLine);
             }
         }else{
-            System.out.println(Message.CANNOT_HAVE_INPUT.with_parameter(commandName));
+            System.out.print(Message.CANNOT_HAVE_INPUT.with_parameter(commandName));
         }
     }
 

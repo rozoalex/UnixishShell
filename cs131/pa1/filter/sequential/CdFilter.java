@@ -23,7 +23,7 @@ public class CdFilter extends SequentialFilterAdvanced {
     @Override
     public void process() {
         if(input.size()==0){
-            System.out.println(Message.REQUIRES_PARAMETER.with_parameter(commandName));
+            System.out.print(Message.REQUIRES_PARAMETER.with_parameter(commandName));
         }else if(input.size()==1){
             output.add(processLine(input.poll()));
         }else{
@@ -31,7 +31,7 @@ public class CdFilter extends SequentialFilterAdvanced {
             for(String s:input){
                 temp = temp + " "+s;
             }
-            System.out.println(Message.COMMAND_NOT_FOUND.with_parameter(temp));
+            System.out.print(Message.COMMAND_NOT_FOUND.with_parameter(temp));
         }
     }
 
@@ -56,7 +56,7 @@ public class CdFilter extends SequentialFilterAdvanced {
         if(newDir.exists()){
             SequentialREPL.currentWorkingDirectory=dirline;
         }else{
-            System.out.println(Message.DIRECTORY_NOT_FOUND.with_parameter(this.commandName+" "+dirline));
+            System.out.print(Message.DIRECTORY_NOT_FOUND.with_parameter(this.commandName+" "+dirline));
         }
     }
 

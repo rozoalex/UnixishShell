@@ -6,15 +6,15 @@ import cs131.pa1.filter.Filter;
 
 
 public abstract class SequentialFilter extends Filter {
-	
+
 	protected Queue<String> input;
 	protected Queue<String> output;
-	
+
 	@Override
 	public void setPrevFilter(Filter prevFilter) {
 		prevFilter.setNextFilter(this);
 	}
-	
+
 	@Override
 	public void setNextFilter(Filter nextFilter) {
 		if (nextFilter instanceof SequentialFilter){
@@ -29,7 +29,7 @@ public abstract class SequentialFilter extends Filter {
 			throw new RuntimeException("Should not attempt to link dissimilar filter types.");
 		}
 	}
-	
+
 	public void process(){
 		while (!input.isEmpty()){
 			String line = input.poll();
@@ -37,14 +37,14 @@ public abstract class SequentialFilter extends Filter {
 			if (processedLine != null){
 				output.add(processedLine);
 			}
-		}	
+		}
 	}
-	
+
 	@Override
 	public boolean isDone() {
 		return input.size() == 0;
 	}
-	
+
 	protected abstract String processLine(String line);
-	
+
 }
