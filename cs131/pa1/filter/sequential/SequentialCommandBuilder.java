@@ -38,20 +38,25 @@ public class SequentialCommandBuilder {
 				currentFilter=null;
 				positionCounter=0;
 			}else {
+				if(temp.equals(">")){
+					filterStack.push(currentFilter);
+					currentFilter=null;
+					positionCounter=0;
+				}
                 //System.out.println(positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp));
 				if (positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp)) {
 					currentFilter = SequentialREPL.commandCollection.get(temp);
-					//System.out.println("setup filter " + currentFilter.getCommandName());
+					System.out.println("setup filter " + currentFilter.getCommandName());
 				} else if (positionCounter != 0 && currentFilter != null) {
 					currentFilter.addInput(temp);
-					//System.out.println("add inp " + temp);
+					System.out.println("add inp " + temp);
 				} else {
-					System.out.println(Message.COMMAND_NOT_FOUND.with_parameter(temp));
+					System.out.print(Message.COMMAND_NOT_FOUND.with_parameter(temp));
 					return null;
 				}
 
 				if(counter==0 &&(temp.equals("grep")|| temp.equals("wc")|| temp.equals(">"))){
-                    System.out.println(Message.REQUIRES_INPUT.with_parameter(temp));
+                    System.out.print(Message.REQUIRES_INPUT.with_parameter(temp));
                     return null;
                 }
                 positionCounter++;

@@ -14,6 +14,8 @@ import java.util.Queue;
  */
 public class WriteFilter extends SequentialFilterAdvanced {
 
+    String outputFile = null;
+
     public WriteFilter(Queue<String> inp){
         setInput(inp);
         initializeInOut();
@@ -27,14 +29,18 @@ public class WriteFilter extends SequentialFilterAdvanced {
     }
 
     @Override
-    public void process() {
-        if(input.size()==0){
-            System.out.println(Message.REQUIRES_INPUT.with_parameter(commandName));
-        }else if(input.size()==1){
-            processLine(input.poll());
-        }else {
-            System.out.println(Message.INVALID_PARAMETER.with_parameter(commandName));
+    public void addInput(String parameters) {
+        if(outputFile==null){
+            outputFile=parameters;
+        }else{
+            System.out.print(Message.INVALID_PARAMETER.with_parameter(commandName));
         }
+
+    }
+
+    @Override
+    public void process() {
+        processLine(outputFile);
     }
 
     @Override
@@ -59,9 +65,6 @@ public class WriteFilter extends SequentialFilterAdvanced {
         }catch (FileNotFoundException fnf){
             fnf.printStackTrace();
         }
-
-
-
 
         return null;
     }
