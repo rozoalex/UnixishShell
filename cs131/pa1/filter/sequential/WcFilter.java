@@ -36,11 +36,11 @@ public class WcFilter extends SequentialFilterAdvanced {
         int numbOfChars=0;
         while(!input.isEmpty()){
             String temp=input.poll();
+            numbOfChars=numbOfChars+temp.length();
             Scanner tempScan = new Scanner(temp);
             while(tempScan.hasNext()){
                 numbOfWords++;
                 String word=tempScan.next();
-                numbOfChars=numbOfChars+word.length();
             }
         }
         out=out+" "+String.valueOf(numbOfWords)+" "+String.valueOf(numbOfChars);
