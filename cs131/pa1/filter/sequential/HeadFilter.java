@@ -54,6 +54,8 @@ public class HeadFilter extends SequentialFilterAdvanced {
             }
             processLine(input.poll());
 
+        }else if(input.size()==0){
+            System.out.print(Message.REQUIRES_PARAMETER.with_parameter(commandName));
         }
 
     }
@@ -93,7 +95,7 @@ public class HeadFilter extends SequentialFilterAdvanced {
                     counter++;
                 }
             }catch(FileNotFoundException h){
-                    System.out.print(Message.FILE_NOT_FOUND.with_parameter(fileName));
+                    System.out.print(Message.FILE_NOT_FOUND.with_parameter(commandName+" "+ fileName));
             }
 
 

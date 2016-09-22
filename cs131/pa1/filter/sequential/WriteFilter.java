@@ -50,7 +50,7 @@ public class WriteFilter extends SequentialFilterAdvanced {
             f.delete();
         }
 
-        f.mkdirs();
+
         try {
             f.createNewFile();
         } catch (IOException e) {

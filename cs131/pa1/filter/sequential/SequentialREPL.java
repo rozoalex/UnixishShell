@@ -16,7 +16,7 @@ public class SequentialREPL {
 	public static void main(String[] args){
 
         currentWorkingDirectory=System.getProperty("user.dir");
-        System.out.println(currentWorkingDirectory);
+        //System.out.println(currentWorkingDirectory);
         updateCommands();
         Scanner r = new Scanner(System.in);
         System.out.print(Message.WELCOME);
@@ -28,6 +28,7 @@ public class SequentialREPL {
             }
             //System.out.println();
 		}
+		//System.out.print(Message.NEWCOMMAND);
         System.out.print(Message.GOODBYE);
 
 	}

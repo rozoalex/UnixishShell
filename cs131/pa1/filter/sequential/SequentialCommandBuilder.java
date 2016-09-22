@@ -46,10 +46,10 @@ public class SequentialCommandBuilder {
                 //System.out.println(positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp));
 				if (positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp)) {
 					currentFilter = SequentialREPL.commandCollection.get(temp);
-					System.out.println("setup filter " + currentFilter.getCommandName());
+					//System.out.println("setup filter " + currentFilter.getCommandName());
 				} else if (positionCounter != 0 && currentFilter != null) {
 					currentFilter.addInput(temp);
-					System.out.println("add inp " + temp);
+					//System.out.println("add inp " + temp);
 				} else {
 					System.out.print(Message.COMMAND_NOT_FOUND.with_parameter(temp));
 					return null;
