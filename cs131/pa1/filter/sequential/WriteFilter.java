@@ -29,6 +29,12 @@ public class WriteFilter extends SequentialFilterAdvanced {
     }
 
     @Override
+    public void clear() {
+        outputFile = null;
+        super.clear();
+    }
+
+    @Override
     public void addInput(String parameters) {
         if(outputFile==null){
             outputFile=parameters;

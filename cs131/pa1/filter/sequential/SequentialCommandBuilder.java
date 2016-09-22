@@ -17,68 +17,120 @@ public class SequentialCommandBuilder {
 	}
 
 
+
+
+	private LinkedList<String> seperateCommand(String rowIn){
+		LinkedList<String> commands = new LinkedList<>();
+		Scanner commandScanner = new Scanner(rowIn);
+		String temp="";
+        int counter=0;
+		while (commandScanner.hasNext()) {
+			String cur = commandScanner.next();
+			if (cur.equals("|")) {
+				commands.add(temp);
+				temp = "";
+			} else {
+				if(cur.equals(">")&&(counter!=0)){
+					commands.add(temp);
+					temp = "";
+				}
+
+				if (temp.equals("")) {
+					temp = temp + cur;
+				} else {
+					temp = temp + " " + cur;
+				}
+
+				if (!commandScanner.hasNext()) {
+					commands.add(temp);
+				}
+
+			}
+			counter++;
+		}
+
+		return commands;
+	}
+
+
+
+
 	//interpret the rowinput
 	//returns a stack of all filters with parameters
 	//the first filter is at the buttom
-	private Stack<SequentialFilterAdvanced> createFiltersFromCommand(String rowInp){
-		//rowInp=rowInp.replaceAll("|"," | ");
-		Scanner commandScanner = new Scanner(rowInp);
-		//System.out.println("In createFiltersFromCommand,  rowInp is "+rowInp);
-		Stack<SequentialFilterAdvanced> filterStack=new Stack<>() ;
-		int positionCounter=0;
-        int counter=0;
-		SequentialFilterAdvanced currentFilter=null;
-		while (commandScanner.hasNext()){
-			String temp=commandScanner.next();
-			//System.out.println("------temp is "+temp);
-			if(temp.equals("|")){
-				if (currentFilter!=null){
-					filterStack.push(currentFilter);
-				}
-				currentFilter=null;
-				positionCounter=0;
-			}else {
-				if(temp.equals(">")){
-					filterStack.push(currentFilter);
-					currentFilter=null;
-					positionCounter=0;
-				}
-                //System.out.println(positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp));
-				if (positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp)) {
-					currentFilter = SequentialREPL.commandCollection.get(temp);
-					//System.out.println("setup filter " + currentFilter.getCommandName());
-				} else if (positionCounter != 0 && currentFilter != null) {
-					currentFilter.addInput(temp);
-					//System.out.println("add inp " + temp);
-				} else {
-					System.out.print(Message.COMMAND_NOT_FOUND.with_parameter(temp));
-					return null;
-				}
+	private Stack<SequentialFilterAdvanced> createFiltersFromCommand(String rowInp) {
 
-				if(counter==0 &&(temp.equals("grep")|| temp.equals("wc")|| temp.equals(">"))){
-                    System.out.print(Message.REQUIRES_INPUT.with_parameter(temp));
-                    return null;
+		//System.out.println("In createFiltersFromCommand,  rowInp is "+rowInp);
+		LinkedList<String> commands = seperateCommand(rowInp);
+		Stack<SequentialFilterAdvanced> filterStack = new Stack<>();
+        int counter = 0;
+        for(String c:commands) {
+            int positionCounter = 0;
+            SequentialFilterAdvanced currentFilter = null;
+            Scanner commandScanner = new Scanner(c);
+            while (commandScanner.hasNext()) {
+                String temp = commandScanner.next();
+                if (positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp)) {
+                    currentFilter = SequentialREPL.commandCollection.get(temp);
+                        //System.out.println("setup filter " + currentFilter.getCommandName());
+                } else if(positionCounter == 0 && !SequentialREPL.commandCollection.keySet().contains(temp)){
+                    System.out.print(Message.COMMAND_NOT_FOUND.with_parameter(c));
+                    currentFilter = null;
+                    //return null;
                 }
+                if (positionCounter != 0 && currentFilter != null) {
+                    currentFilter.addInput(temp);
+                        //System.out.println("add inp " + temp);
+                }
+
+
+
+                if (counter == 0 && (temp.equals("grep") || temp.equals("wc") || temp.equals(">"))) {
+                    System.out.print(Message.REQUIRES_INPUT.with_parameter(c));
+                    currentFilter = null;
+                        //return null;
+                }
+
+
                 positionCounter++;
-			}
+
+
+                if (doesErrorHappen) {
+                    doesErrorHappen = false;
+                    currentFilter = null;
+                }
+            }
 
             counter++;
-            if(doesErrorHappen){
-            	doesErrorHappen=false;
-                return null;
+            if (currentFilter != null) {
+                filterStack.add(currentFilter);
             }
-		}
-
-		if (currentFilter!=null){
-			filterStack.add(currentFilter);
-		}
+        }
 
 
 		//System.out.println(filterStack.peek().getCommandName());
 		return filterStack;
 	}
 
-	//set up head
+    private String wholeCommand(String temp, String rowInput ) {
+    	Scanner cs = new Scanner(rowInput);
+		boolean b =false;
+        while(cs.hasNext()) {
+			String t = cs.next();
+			if (t.equals(temp)) {
+				b = true;
+			}
+			if (b){
+				if (t.equals("|") || t.equals(">")) {
+					return temp;
+				}
+			temp = temp + " " + t;
+			}
+        }
+        return temp;
+    }
+
+    //set up head
 	//the first filter to execute
 	private void linkFilters(Stack<SequentialFilterAdvanced> filters){
 	    if(filters!=null) {

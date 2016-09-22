@@ -1,5 +1,6 @@
 package cs131.pa1.filter.sequential;
 
+import cs131.pa1.filter.Filter;
 import cs131.pa1.filter.Message;
 
 import java.io.File;
@@ -42,16 +43,16 @@ public class CdFilter extends SequentialFilterAdvanced {
                 return null;
             case "..":
                 String parentDir = (new File(SequentialREPL.currentWorkingDirectory)).getParent();
-                setDir(parentDir);
+                setAbsDir(parentDir);
                 return null;
             default:
-                setDir(line);
+                setAbsDir(SequentialREPL.currentWorkingDirectory+ Filter.FILE_SEPARATOR +line);
                 return null;
         }
 
     }
 
-    private void setDir(String dirline) {
+    private void setAbsDir(String dirline) {
         File newDir = (new File(dirline));
         if(newDir.exists()){
             SequentialREPL.currentWorkingDirectory=dirline;

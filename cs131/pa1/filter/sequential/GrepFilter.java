@@ -42,7 +42,18 @@ public class GrepFilter extends SequentialFilterAdvanced {
     }
 
     @Override
+    public void process() {
+        if (keyword==null){
+            System.out.print(Message.REQUIRES_PARAMETER.with_parameter(commandName));
+        }
+        super.process();
+    }
+
+    @Override
     protected String processLine(String line) {
+        if (line==null || keyword==null){
+            return null;
+        }
         return line.contains(keyword) ? line : null;
     }
 }
