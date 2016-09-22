@@ -22,6 +22,7 @@ public class SequentialCommandBuilder {
 	private LinkedList<String> seperateCommand(String rowIn){
 		LinkedList<String> commands = new LinkedList<>();
 		Scanner commandScanner = new Scanner(rowIn);
+
 		String temp="";
         int counter=0;
 		while (commandScanner.hasNext()) {
@@ -76,7 +77,7 @@ public class SequentialCommandBuilder {
                 } else if(positionCounter == 0 && !SequentialREPL.commandCollection.keySet().contains(temp)){
                     System.out.print(Message.COMMAND_NOT_FOUND.with_parameter(c));
                     currentFilter = null;
-                    //return null;
+                    filterStack.clear();//Clear the Stack if current filter fails
                 }
                 if (positionCounter != 0 && currentFilter != null) {
                     currentFilter.addInput(temp);
@@ -88,7 +89,7 @@ public class SequentialCommandBuilder {
                 if (counter == 0 && (temp.equals("grep") || temp.equals("wc") || temp.equals(">"))) {
                     System.out.print(Message.REQUIRES_INPUT.with_parameter(c));
                     currentFilter = null;
-                        //return null;
+                    filterStack.clear();//Clear the Stack if current filter fails
                 }
 
 

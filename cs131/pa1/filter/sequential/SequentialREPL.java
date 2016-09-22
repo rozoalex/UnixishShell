@@ -29,6 +29,8 @@ public class SequentialREPL {
             //System.out.println();
 		}
 
+		System.out.print(Message.NEWCOMMAND);
+
         System.out.print(Message.GOODBYE);
 
 	}
