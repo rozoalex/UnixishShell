@@ -73,11 +73,11 @@ public abstract class SequentialFilterAdvanced extends SequentialFilter {
     }
 
     protected void meaninglessLongCommand(){
-        String temp=this.getCommandName()+"";
+        String temp=this.getCommandName();
         for(String s:input){
             temp = temp + " "+s;
         }
-        System.out.print(Message.COMMAND_NOT_FOUND.with_parameter(temp));
+        System.out.print(Message.INVALID_PARAMETER.with_parameter(temp));
 
     }
 

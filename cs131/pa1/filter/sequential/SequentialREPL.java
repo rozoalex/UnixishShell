@@ -7,22 +7,21 @@ import java.util.*;
 public class SequentialREPL {
 
 	static String currentWorkingDirectory;
-    //static private final String welcomeWords="> Welcome to the Unix-ish command line.";
-    //static private final String byeWords="Thank you for using the Unix-ish command line. Goodbye!";
-	static boolean isRunning;
+    static boolean isRunning;
     public static HashMap<String,SequentialFilterAdvanced> commandCollection;
     public static boolean doesErrorHappen;
     public static SequentialFilterAdvanced head;
     private static boolean isDone;
+    //public static String currentCommand=null;
 
 	public static void main(String[] args){
-
 	    isRunning = true;
         isDone = false;
 	    doesErrorHappen = false;
 	    commandCollection = new HashMap();
+        head=null;
         currentWorkingDirectory=System.getProperty("user.dir");
-        //System.out.println(currentWorkingDirectory);
+//        System.out.println(currentWorkingDirectory);
         updateCommands();
         Scanner r = new Scanner(System.in);
         System.out.print(Message.WELCOME);
@@ -34,11 +33,11 @@ public class SequentialREPL {
             }
             head=null;
             //System.out.println();
-
 		}
 
 		//System.out.print(Message.NEWCOMMAND);
 
+        r.close();
         System.out.print(Message.GOODBYE);
 
 	}
@@ -58,8 +57,7 @@ public class SequentialREPL {
             isRunning=false;
             return;
         }
-        //SequentialCommandBuilder scb = new SequentialCommandBuilder(nextCommand);
-        //scb.start();
+
 
         linkFilters(createFiltersFromCommand(nextCommand));
         execution(head);
@@ -97,25 +95,53 @@ public class SequentialREPL {
             }
             counter++;
         }
-
+        commandScanner.close();
         return commands;
     }
 
     private static Stack<SequentialFilterAdvanced> createFiltersFromCommand(String rowInp) {
 
-        //System.out.println("In createFiltersFromCommand,  rowInp is "+rowInp);
+        //boolean haveCD=false ;
         LinkedList<String> commands = seperateCommand(rowInp);
         Stack<SequentialFilterAdvanced> filterStack = new Stack<>();
         int counter = 0;
+        boolean doesCdOutput =false;
+        String prevC=null;
         for(String c:commands) {
+
+            //currentCommand=c;
             int positionCounter = 0;
             SequentialFilterAdvanced currentFilter = null;
             Scanner commandScanner = new Scanner(c);
+            if(doesCdOutput){
+
+                System.out.print(Message.CANNOT_HAVE_OUTPUT.with_parameter(prevC));
+                currentFilter = null;
+                filterStack.clear();
+            }
+
             while (commandScanner.hasNext()) {
-                //System.out.print("what's up");//testing
                 String temp = commandScanner.next();
                 if (positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp)) {
                     currentFilter = SequentialREPL.commandCollection.get(temp);
+
+                    if(currentFilter instanceof HeadFilter || currentFilter instanceof CdFilter ){
+                        if(!filterStack.isEmpty()){
+                            System.out.print(Message.CANNOT_HAVE_INPUT.with_parameter(c));
+                            currentFilter = null;
+                            filterStack.clear();
+                        }
+                    }
+
+                    if(currentFilter instanceof CdFilter ){
+                        doesCdOutput=true;
+                        prevC=c;
+                    }
+
+
+
+
+
                     //System.out.println("setup filter " + currentFilter.getCommandName());
                 } else if(positionCounter == 0 && !SequentialREPL.commandCollection.keySet().contains(temp)){
                     System.out.print(Message.COMMAND_NOT_FOUND.with_parameter(c));

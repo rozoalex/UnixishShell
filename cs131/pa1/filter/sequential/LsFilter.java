@@ -12,12 +12,11 @@ import java.util.Queue;
 public class LsFilter extends SequentialFilterAdvanced {
 
 
-    public LsFilter(Queue<String> inp){
-        setInput(inp);
-        commandName = "ls";
-        initializeInOut();
-
-    }
+    //public LsFilter(Queue<String> inp){
+    //    setInput(inp);
+    //    commandName = "ls";
+    //    initializeInOut();
+    //}//useless constructor
 
     public LsFilter(){
         this.input=null;

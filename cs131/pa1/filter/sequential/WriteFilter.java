@@ -46,6 +46,11 @@ public class WriteFilter extends SequentialFilterAdvanced {
 
     @Override
     public void process() {
+        if (outputFile==null){
+            System.out.print(Message.REQUIRES_PARAMETER.with_parameter(commandName));
+            output.clear();
+            return;
+        }
         processLine(outputFile);
     }
 

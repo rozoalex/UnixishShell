@@ -19,12 +19,12 @@ public class HeadFilter extends SequentialFilterAdvanced {
     private int numberOfOutputLines;//default is 10
     private boolean haveNumberPara=false;
 
-    public HeadFilter(Queue<String> inp){
-        setInput(inp);
-        initializeInOut();
-        numberOfOutputLines=10;
-        commandName="head";
-    }
+    //public HeadFilter(Queue<String> inp){
+    //    setInput(inp);
+    //    initializeInOut();
+    //    numberOfOutputLines=10;
+    //    commandName="head";
+    //} //useless constructor
 
     public HeadFilter(){
         this.input=null;
@@ -41,35 +41,49 @@ public class HeadFilter extends SequentialFilterAdvanced {
         super.clear();
     }
 
+
+
     @Override
     public void process() {
+
+
+
        // System.out.println("head head head");
         if(input.size()>2){
             meaninglessLongCommand();
         }else if (input.size()==1){
-            processLine(input.poll());
+            String s =input.poll();
+            if(isNumeric(s)){
+                System.out.print(Message.REQUIRES_PARAMETER.with_parameter(commandName+" "+s));//e.g. head -100 /n
+            }else {
+                processLine(s);  //default 10 lines
+            }
         }else if(input.size()==2){
-            String temp=input.poll();
+            String temp=input.peek();
             if(isNumeric(temp)){
                 haveNumberPara=true;
                 numberOfOutputLines=Math.abs(Integer.parseInt(temp));
+                input.poll();
+                processLine(input.poll()); //e.g. head -5 j.txt
             }else{
-                meaninglessLongCommand();
+                meaninglessLongCommand(); //if user input is nonsense
+                output.clear();
+                return;
             }
-            processLine(input.poll());
+
 
         }else if(input.size()==0){
-            System.out.print(Message.REQUIRES_PARAMETER.with_parameter(commandName));
+            System.out.print(Message.REQUIRES_PARAMETER.with_parameter(commandName)); //e.g. head /n
         }
 
     }
 
-    //check if a string can be a double
+    //check if a string can be a Int
     private boolean isNumeric(String str)
     {
         try
         {
-            double d = Double.parseDouble(str);
+            int d = Integer.parseInt(str);
         }
         catch(NumberFormatException nfe)
         {

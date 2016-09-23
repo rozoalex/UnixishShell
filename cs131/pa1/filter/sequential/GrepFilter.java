@@ -11,11 +11,11 @@ public class GrepFilter extends SequentialFilterAdvanced {
 
     private String keyword=null;
 
-    public GrepFilter(Queue<String> inp){
-        setInput(inp);
-        initializeInOut();
-        commandName="grep";
-    }
+    //public GrepFilter(Queue<String> inp){
+    //    setInput(inp);
+    //    initializeInOut();
+    //    commandName="grep";
+    //} //useless constructor
 
     public GrepFilter(){
         this.input=null;

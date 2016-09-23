@@ -34,6 +34,11 @@ public class WcFilter extends SequentialFilterAdvanced {
                 return;
             }
 
+            if(prev==null){
+                output.clear();
+                return;
+            }
+
             String out = "";
             out = out + String.valueOf(input.size());
             int numbOfWords = 0;

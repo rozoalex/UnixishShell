@@ -9,11 +9,11 @@ import java.util.Queue;
 public class CdFilter extends SequentialFilterAdvanced {
 
 
-    public CdFilter(Queue<String> inp){
-        this.input=inp;
-        commandName = "cd";
-        initializeInOut();
-    }
+    //public CdFilter(Queue<String> inp){
+    //    this.input=inp;
+    //    commandName = "cd";
+    //    initializeInOut();
+    //}//useless constructor
 
     public CdFilter(){
         this.input=null;
@@ -23,6 +23,16 @@ public class CdFilter extends SequentialFilterAdvanced {
 
     @Override
     public void process() {
+        if(prev!=null){
+            String s=commandName;
+            if(input!=null) {
+                while (!input.isEmpty()) {
+                    s=s+" "+input.poll();
+                }
+            }
+            System.out.print(Message.CANNOT_HAVE_INPUT.with_parameter(s));
+        }
+
         if(input.size()==0){
             System.out.print(Message.REQUIRES_PARAMETER.with_parameter(commandName));
         }else if(input.size()==1){
