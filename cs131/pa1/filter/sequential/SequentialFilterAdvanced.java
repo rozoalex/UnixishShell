@@ -52,8 +52,7 @@ public abstract class SequentialFilterAdvanced extends SequentialFilter {
     }
 
     public void clear(){
-        this.input.clear();
-        this.output.clear();
+        initializeInOut();
         this.prev=null;
         this.next=null;
     }

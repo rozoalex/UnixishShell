@@ -38,26 +38,30 @@ public class CdFilter extends SequentialFilterAdvanced {
 
     @Override
     protected String processLine(String line) {
-        switch (line){
-            case ".":
-                return null;
-            case "..":
-                String parentDir = (new File(SequentialREPL.currentWorkingDirectory)).getParent();
-                setAbsDir(parentDir);
-                return null;
-            default:
-                setAbsDir(SequentialREPL.currentWorkingDirectory+ Filter.FILE_SEPARATOR +line);
-                return null;
-        }
-
+        setAbsDir(line);
+        return null;
     }
 
     private void setAbsDir(String dirline) {
-        File newDir = (new File(dirline));
-        if(newDir.exists()){
-            SequentialREPL.currentWorkingDirectory=dirline;
+        String newDir=null;
+        switch (dirline){
+            case ".":
+                return;
+            case "..":
+                newDir = (new File(SequentialREPL.currentWorkingDirectory)).getParent();
+                break;
+            default:
+                newDir = SequentialREPL.currentWorkingDirectory+ Filter.FILE_SEPARATOR +dirline;
+                break;
+
+        }
+
+
+        File newAbsDir = (new File(newDir));
+        if(newAbsDir.exists()){
+            SequentialREPL.currentWorkingDirectory=newDir;
         }else{
-            System.out.print(Message.DIRECTORY_NOT_FOUND.with_parameter(this.commandName+" "+dirline));
+            System.out.print(Message.DIRECTORY_NOT_FOUND.with_parameter(commandName+" "+dirline));
         }
     }
 

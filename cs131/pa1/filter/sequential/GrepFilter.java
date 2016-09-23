@@ -30,9 +30,10 @@ public class GrepFilter extends SequentialFilterAdvanced {
             //System.out.println("The keyword is "+keyword);
         }else {
             meaninglessLongCommand();
-            SequentialCommandBuilder.doesErrorHappen=true;
+            SequentialREPL.doesErrorHappen=true;
         }
     }
+
 
 
     @Override

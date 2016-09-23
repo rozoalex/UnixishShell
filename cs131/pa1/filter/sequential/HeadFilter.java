@@ -17,6 +17,7 @@ public class HeadFilter extends SequentialFilterAdvanced {
 
 
     private int numberOfOutputLines;//default is 10
+    private boolean haveNumberPara=false;
 
     public HeadFilter(Queue<String> inp){
         setInput(inp);
@@ -35,12 +36,14 @@ public class HeadFilter extends SequentialFilterAdvanced {
 
     @Override
     public void clear() {
+        haveNumberPara=false;
         numberOfOutputLines=10;
         super.clear();
     }
 
     @Override
     public void process() {
+       // System.out.println("head head head");
         if(input.size()>2){
             meaninglessLongCommand();
         }else if (input.size()==1){
@@ -48,6 +51,7 @@ public class HeadFilter extends SequentialFilterAdvanced {
         }else if(input.size()==2){
             String temp=input.poll();
             if(isNumeric(temp)){
+                haveNumberPara=true;
                 numberOfOutputLines=Math.abs(Integer.parseInt(temp));
             }else{
                 meaninglessLongCommand();
@@ -95,8 +99,17 @@ public class HeadFilter extends SequentialFilterAdvanced {
                     counter++;
                 }
             }catch(FileNotFoundException h){
-                    System.out.print(Message.FILE_NOT_FOUND.with_parameter(commandName+" "+ fileName));
-            }
+                    if(next!=null){
+                        SequentialFilterAdvanced sfa = (SequentialFilterAdvanced) next;
+                        sfa.output=null;
+                    }
+                    if(!haveNumberPara) {
+                        System.out.print(Message.FILE_NOT_FOUND.with_parameter(commandName + " " + fileName));
+                    }else{
+                        System.out.print(Message.FILE_NOT_FOUND.with_parameter(commandName + " -"+numberOfOutputLines+ " " + fileName));
+                    }
+
+                    }
 
 
         }
