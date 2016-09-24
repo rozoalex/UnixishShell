@@ -2,7 +2,7 @@ package cs131.pa1.filter.sequential;
 
 /**
  * enum of all filters
- * easy to add new commands
+ * it's easy to add new commands
  */
 public enum CommandFilters {
     LS(new LsFilter()),

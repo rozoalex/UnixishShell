@@ -66,6 +66,7 @@ public class HeadFilter extends SequentialFilterAdvanced {
                 input.poll();
                 processLine(input.poll()); //e.g. head -5 j.txt
             }else{
+                //testLsCannotHaveInput mysteriously call this
                 meaninglessLongCommand(); //if user input is nonsense
                 output.clear();
                 return;
@@ -102,6 +103,7 @@ public class HeadFilter extends SequentialFilterAdvanced {
                 //System.out.println(output.peek());
                 counter++;
             }
+            readFile.close();
 
         }catch (FileNotFoundException e){
             try{

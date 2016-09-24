@@ -1,14 +1,13 @@
 package cs131.pa1.filter.sequential;
 
-import cs131.pa1.filter.Filter;
 import cs131.pa1.filter.Message;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Created by rozoa on 9/18/2016.
+ * The abstract class extends the sequential filter abstract class and adds lots of useful methods
+ * The class is extended by each specific filter
  */
 public abstract class SequentialFilterAdvanced extends SequentialFilter {
 
@@ -37,9 +36,6 @@ public abstract class SequentialFilterAdvanced extends SequentialFilter {
             if (this.output == null) {
                 this.output = new LinkedList<String>();
             }
-
-
-
             if (this.next instanceof SequentialFilterAdvanced) {
                 SequentialFilterAdvanced nextSFA = (SequentialFilterAdvanced) this.next;
                 nextSFA.addAllInput(inp);
@@ -58,13 +54,17 @@ public abstract class SequentialFilterAdvanced extends SequentialFilter {
     }
 
     public boolean hasNext(){
-
         return (next!=null);
     }
 
 
     public SequentialFilterAdvanced getNext(){
         SequentialFilterAdvanced sfa= (SequentialFilterAdvanced) next;
+        return sfa;
+    }
+
+    public SequentialFilterAdvanced getPrev(){
+        SequentialFilterAdvanced sfa= (SequentialFilterAdvanced) prev;
         return sfa;
     }
 

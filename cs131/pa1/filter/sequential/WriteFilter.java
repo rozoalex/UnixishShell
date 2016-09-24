@@ -73,6 +73,7 @@ public class WriteFilter extends SequentialFilterAdvanced {
             while(!input.isEmpty()){
                 ps.println(input.poll());
             }
+            ps.close();
         }catch (FileNotFoundException fnf){
             fnf.printStackTrace();
         }

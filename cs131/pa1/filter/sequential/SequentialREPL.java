@@ -4,75 +4,91 @@ import cs131.pa1.filter.Message;
 
 import java.util.*;
 
+//Created by Yuanze Hu
+
+//The main
 public class SequentialREPL {
 
 	static String currentWorkingDirectory;
+    //stores the current working dir. Can be set by cd.
     static boolean isRunning;
+    //if it's true the REPL loop will keep running.
     public static HashMap<String,SequentialFilterAdvanced> commandCollection;
+    //command names as keys and different filters are values
     public static boolean doesErrorHappen;
+    //indicates there are errors happening inside a filter
     public static SequentialFilterAdvanced head;
+    //The first filter
     private static boolean isDone;
-    //public static String currentCommand=null;
+    //indicates if the execution process done. Works only for the execution method
 
 	public static void main(String[] args){
 	    isRunning = true;
-        isDone = false;
-	    doesErrorHappen = false;
-	    commandCollection = new HashMap();
-        head=null;
-        currentWorkingDirectory=System.getProperty("user.dir");
-//        System.out.println(currentWorkingDirectory);
-        updateCommands();
+        currentWorkingDirectory=System.getProperty("user.dir");// get working dir
+        commandCollection = new HashMap<String,SequentialFilterAdvanced>();
+        initializeFilterCollection();//initialize the filters
         Scanner r = new Scanner(System.in);
         System.out.print(Message.WELCOME);
         while(isRunning){
+            clearFilters();//wash the filters after using
+            //reset the booleans
+            isDone = false;
+            doesErrorHappen = false;
+            head=null;
+            //reset the booleans
             System.out.print(Message.NEWCOMMAND);
             String nextCommand=r.nextLine();
             if(!nextCommand.equals("")) {
                 doCommand(nextCommand);
-            }
-            head=null;
-            //System.out.println();
+            }//process command if the command is not just empty
 		}
-
-		//System.out.print(Message.NEWCOMMAND);
-
         r.close();
-        System.out.print(Message.GOODBYE);
+        System.out.print(Message.GOODBYE);// bye~
 
 	}
 
-	//set up all the supported commands
+	//initialize all supported filters
     //store the names and the corresponding filter in a hashmap
-    private static void updateCommands() {
+    //call ONLY ONCE at the begining of the main method
+    private static void initializeFilterCollection() {
         for(CommandFilters c: CommandFilters.values()){
             commandCollection.put(c.getFilterName(),c.getFilter());
         }
     }
 
-
-    //method for executing the command
-    private static void doCommand(String nextCommand) {
-        if(nextCommand.equals("exit")){
-            isRunning=false;
-            return;
+    //the method reset all the filters in the filter collection
+    //wash after use
+    //call EVERY TIME in the REPL while loop
+    private static void clearFilters() {
+        for(SequentialFilterAdvanced sfa:commandCollection.values()){
+            sfa.clear();
         }
-
-
-        linkFilters(createFiltersFromCommand(nextCommand));
-        execution(head);
     }
 
 
 
+    //method for processing the command
+    private static void doCommand(String nextCommand) {
+        if(nextCommand.equals("exit")){
+            isRunning=false;
+            return;
+        }//exit has no need to create a filter. It is just hardcoded here.
+
+        head = (SequentialFilterAdvanced) linkFilters(createFiltersFromCommand(nextCommand));
+        //executionNonRecursive(head);
+        execution(head);
+    }
+
+
+    //seperate commands based on | and >
     private static LinkedList<String> seperateCommand(String rowIn){
         LinkedList<String> commands = new LinkedList<>();
-        Scanner commandScanner = new Scanner(rowIn);
+        Scanner commandS = new Scanner(rowIn);
 
         String temp="";
         int counter=0;
-        while (commandScanner.hasNext()) {
-            String cur = commandScanner.next();
+        while (commandS.hasNext()) {
+            String cur = commandS.next();
             if (cur.equals("|")) {
                 commands.add(temp);
                 temp = "";
@@ -88,40 +104,37 @@ public class SequentialREPL {
                     temp = temp + " " + cur;
                 }
 
-                if (!commandScanner.hasNext()) {
+                if (!commandS.hasNext()) {
                     commands.add(temp);
                 }
 
             }
             counter++;
         }
-        commandScanner.close();
+        commandS.close();
         return commands;
     }
 
+    //Put command filters in a stack with their inputs
     private static Stack<SequentialFilterAdvanced> createFiltersFromCommand(String rowInp) {
-
-        //boolean haveCD=false ;
         LinkedList<String> commands = seperateCommand(rowInp);
         Stack<SequentialFilterAdvanced> filterStack = new Stack<>();
         int counter = 0;
-        boolean doesCdOutput =false;
+        boolean doesOutput =false;
         String prevC=null;
         for(String c:commands) {
-
-            //currentCommand=c;
             int positionCounter = 0;
             SequentialFilterAdvanced currentFilter = null;
-            Scanner commandScanner = new Scanner(c);
-            if(doesCdOutput){
-
+            String [] commandSteps = c.split(" ");
+            if(doesOutput){
+                //print out the error for cannot have output situation (cd and >)
                 System.out.print(Message.CANNOT_HAVE_OUTPUT.with_parameter(prevC));
                 currentFilter = null;
                 filterStack.clear();
             }
 
-            while (commandScanner.hasNext()) {
-                String temp = commandScanner.next();
+            for (String temp : commandSteps) {
+                //String temp = commandScanner.next();
                 if (positionCounter == 0 && SequentialREPL.commandCollection.keySet().contains(temp)) {
                     currentFilter = SequentialREPL.commandCollection.get(temp);
 
@@ -132,25 +145,21 @@ public class SequentialREPL {
                             filterStack.clear();
                         }
                     }
-
-                    if(currentFilter instanceof CdFilter ){
-                        doesCdOutput=true;
+                    //detect filters that cannot have output
+                    if(currentFilter instanceof CdFilter ||currentFilter instanceof WriteFilter ){
+                        doesOutput=true;
                         prevC=c;
                     }
-
-
-
-
-
-                    //System.out.println("setup filter " + currentFilter.getCommandName());
+                    //detect filters that cannot have output
                 } else if(positionCounter == 0 && !SequentialREPL.commandCollection.keySet().contains(temp)){
+                    // if the command is not found in the filter collection hashmap
+                    //print out command not found
                     System.out.print(Message.COMMAND_NOT_FOUND.with_parameter(c));
                     currentFilter = null;
                     filterStack.clear();//Clear the Stack if current filter fails
                 }
                 if (positionCounter != 0 && currentFilter != null) {
                     currentFilter.addInput(temp);
-                    //System.out.println("add inp " + temp);
                 }
 
 
@@ -177,26 +186,28 @@ public class SequentialREPL {
                 filterStack.add(currentFilter);
             }
         }
-
-
-        //System.out.println(filterStack.peek().getCommandName());
         return filterStack;
     }
 
-    private static void linkFilters(Stack<SequentialFilterAdvanced> filters){
+    //The linkFilters links the filters to a pipeline and setup head
+    private static SequentialFilter linkFilters(Stack<SequentialFilterAdvanced> filters){
+        SequentialFilter h=null;
         if(filters!=null) {
             if (!filters.isEmpty()) {
-                head = filters.pop();
+                h = filters.pop();
             }
 
             while (!filters.isEmpty()) {
                 SequentialFilterAdvanced current = filters.pop();
-                current.setNextFilter(head);
-                head = current;
+                current.setNextFilter(h);
+                h = current;
             }
         }
+        return h;
     }
 
+    //The execution method recursively process the filters
+    //it is the one that does the work
     private static void execution(SequentialFilterAdvanced sfa){
         if(sfa!=null){
             sfa.process();
@@ -210,13 +221,13 @@ public class SequentialREPL {
 
                 isDone=false;
             }
-            sfa.clear();//clear the filter for reuse
+
         }else{
             isDone=true;
         }
-
-
     }
+
+
 
     //method for print the final result
     private static void printAll(Queue<String> output) {
